@@ -4,7 +4,7 @@
  */
 
 /dts-v1/;
-#include "f1c100-business-card.dtsi"
+#include "nabby-linux.dtsi"
 #include <dt-bindings/gpio/gpio.h>
 
 / {
