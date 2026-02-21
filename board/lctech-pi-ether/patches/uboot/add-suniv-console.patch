@@ -1,0 +1,28 @@
+diff --git a/arch/arm/mach-sunxi/board.c b/arch/arm/mach-sunxi/board.c
+index 432b1c10..fb63f716 100644
+--- a/arch/arm/mach-sunxi/board.c
++++ b/arch/arm/mach-sunxi/board.c
+@@ -177,6 +177,11 @@ static int gpio_init(void)
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(0), SUN8I_GPB_UART2);
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(1), SUN8I_GPB_UART2);
+ 	sunxi_gpio_set_pull(SUNXI_GPB(1), SUNXI_GPIO_PULL_UP);
++#elif CONFIG_CONS_INDEX == 3 && defined(CONFIG_MACH_SUNIV)
++	sunxi_gpio_set_cfgpin(SUNXI_GPE(8), SUNIV_GPE_UART2);
++	sunxi_gpio_set_cfgpin(SUNXI_GPE(7), SUNIV_GPE_UART2);
++	sunxi_gpio_set_pull(SUNXI_GPE(7), SUNXI_GPIO_PULL_UP);
++	printf("Applying Joas pinmux\n");
+ #elif CONFIG_CONS_INDEX == 4 && defined(CONFIG_MACH_SUN8I_R528)
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(6), 7);
+ 	sunxi_gpio_set_cfgpin(SUNXI_GPB(7), 7);
+diff --git a/include/sunxi_gpio.h b/include/sunxi_gpio.h
+index 12b54c8d..baaf31fd 100644
+--- a/include/sunxi_gpio.h
++++ b/include/sunxi_gpio.h
+@@ -129,6 +129,7 @@ enum sunxi_gpio_number {
+ #define SUNXI_GPD_LVDS0		3
+ 
+ #define SUNIV_GPE_UART0		5
++#define SUNIV_GPE_UART2		3
+ 
+ #define SUNXI_GPF_SDC0		2
+ #define SUNXI_GPF_UART0		4

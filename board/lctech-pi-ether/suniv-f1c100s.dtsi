@@ -225,7 +225,7 @@
 			};
 			/omit-if-no-ref/   
                         uart2_pe_pins: uart2-pe-pins {
-                                pins = "PE7", "PE8";
+                                pins = "PE8", "PE7";
                                 function = "uart2";
                         };
 		};
