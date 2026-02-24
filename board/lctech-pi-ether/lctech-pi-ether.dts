@@ -62,13 +62,13 @@
 	pinctrl-0 = <&spi1_pe_pins>;
 	status = "okay";
 
-	ethernet@0: w5500@0 {
+	ethernet@0 {
 		compatible = "wiznet,w5500";
 		reg = <0>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&w5500_pins>;
 		interrupt-parent = <&pio>;
-		interrupts = <PE 11 IRQ_TYPE_EDGE_FALLING>;
+		interrupts = <4 11 IRQ_TYPE_EDGE_FALLING>;
 		spi-max-frequency = <30000000>;
 	};
 };
