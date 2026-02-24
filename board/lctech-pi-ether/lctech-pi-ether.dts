@@ -71,7 +71,7 @@
 		interrupts = <PE 11 IRQ_TYPE_EDGE_FALLING>;
 		spi-max-frequency = <30000000>;
 	};
-}
+};
 
 &uart1 {
         pinctrl-names = "default";
