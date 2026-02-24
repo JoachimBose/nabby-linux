@@ -217,13 +217,13 @@
 			spi1_pa_pins: spi1_pa_pins {
 				pins = "PA0", "PA1", "PA2", "PA3";
 				function = "spi1";
-			}
+			};
 
 			/omit-if-no-ref/
 			spi1_pe_pins: spi1_pe_pins {
 				pins = "PE7", "PE8", "PE9", "PE10";
 				function = "spi1";
-			}
+			};
 
 			/omit-if-no-ref/
 			uart0_pe_pins: uart0-pe-pins {
@@ -231,6 +231,7 @@
 				function = "uart0";
 			};
 
+			/omit-if-no-ref/
 			w5500_pins: w5500-pins {
 				pins = "PE11";
 				function = "gpio_in";
