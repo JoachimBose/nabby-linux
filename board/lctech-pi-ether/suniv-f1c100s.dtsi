@@ -212,10 +212,28 @@
 				pins = "PC0", "PC1", "PC2", "PC3";
 				function = "spi0";
 			};
+			
+			/omit-if-no-ref/
+			spi1_pa_pins: spi1_pa_pins {
+				pins = "PA0", "PA1", "PA2", "PA3";
+				function = "spi1";
+			}
 
+			/omit-if-no-ref/
+			spi1_pe_pins: spi1_pe_pins {
+				pins = "PE7", "PE8", "PE9", "PE10";
+				function = "spi1";
+			}
+
+			/omit-if-no-ref/
 			uart0_pe_pins: uart0-pe-pins {
 				pins = "PE0", "PE1";
 				function = "uart0";
+			};
+
+			w5500_pins: w5500-pins {
+				pins = "PE11";
+				function = "gpio_in";
 			};
 
 			/omit-if-no-ref/
@@ -223,11 +241,12 @@
 				pins = "PA2", "PA3";
 				function = "uart1";
 			};
-			/omit-if-no-ref/   
-                        uart2_pe_pins: uart2-pe-pins {
-                                pins = "PE8", "PE7";
-                                function = "uart2";
-                        };
+			
+			/omit-if-no-ref/
+			uart2_pe_pins: uart2-pe-pins {
+					pins = "PE8", "PE7";
+					function = "uart2";
+			};
 		};
 
 		i2c0: i2c@1c27000 {
