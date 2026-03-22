@@ -1,2 +1,4 @@
 /.vagrant
 /*console.log
+package/*/build
+.vscode

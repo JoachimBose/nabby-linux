@@ -1,0 +1,9 @@
+config BR2_PACKAGE_SPOOKYSTATS
+        bool "spookystats"
+        help
+          Spookystats is a http server written in c that is vulnerable to command
+          injections and should not be used in production ghost attraction systems
+          Spookystats is specifically made for VUCTF-26 as a hacking exercise.
+          Happy hacking!
+
+          https://studsec.nl/vuctf
