@@ -3,6 +3,7 @@ extern "C" {
 #endif
 
 const char* gethomepage();
+const char* getsystemtelemetry();
 
 #ifdef __cplusplus
 }

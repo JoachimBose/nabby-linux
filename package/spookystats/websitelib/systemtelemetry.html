@@ -1,0 +1,162 @@
+R"=====(
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeyondLink Telemetry</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #9effff;
+        }
+
+        header {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #0ff;
+            text-shadow: 0 0 8px #0ff;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .panel {
+            border: 1px solid #0ff;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .proc {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            border-bottom: 1px dashed rgba(0, 255, 255, 0.2);
+        }
+
+        .ghost {
+            color: #ff66ff;
+        }
+
+        canvas {
+            width: 100%;
+            height: 150px;
+            background: #000;
+            border: 1px solid #0ff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>System Telemetry</h1>
+        <p>Low-level spectral diagnostics & process monitor</p>
+    </header>
+
+    <div class="container">
+
+        <div class="panel">
+            <h2>Process List (/procs)</h2>
+            <div id="procs"></div>
+        </div>
+
+        <div class="panel">
+            <h2>CPU Ether Load</h2>
+            <canvas id="cpu"></canvas>
+        </div>
+
+        <div class="panel">
+            <h2>Spectral Noise Levels</h2>
+            <canvas id="noise"></canvas>
+        </div>
+
+        <div class="panel">
+            <h2>Diagnostics</h2>
+            <p>Kernel bridge: <span class="ghost">unstable</span></p>
+            <p>Beyond interface: <span class="ghost">partially phased</span></p>
+            <p>Ghost kernel module: loaded</p>
+            <p>Warning: orphaned entities attached to PID 1</p>
+        </div>
+
+    </div>
+
+    <script defer>
+        // sample fallback data
+        let sample = {
+            "1": "systemd",
+            "2": "kthreadd",
+            "3": "pool_workqueue_release",
+            "4": "kworker/R-rcu_gp",
+            "10": "kworker/0:0H-events_highpri",
+            "15": "ksoftirqd/0",
+            "16": "rcu_preempt"
+        };
+
+        async function loadProcs() {
+            console.log("loading procs...")
+            const res = await fetch('/procs');
+            const data = await res.json();
+            renderProcs(data["procs"]);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("content ready!")
+        })
+
+        function renderProcs(data) {
+            const container = document.getElementById('procs');
+            container.innerHTML = '';
+            Object.entries(data).forEach((x) => {
+                const div = document.createElement('div');
+                div.className = 'proc';
+
+                let spooky = Math.random() < 0.05;
+                console.log(x)
+                div.innerHTML = `<span>${x[1]["pid"]}</span><span class="${spooky ? 'ghost' : ''}">${x[1]["comm"]}${spooky ? ' (possessed)' : ''} <a href="/proc/${x[1]["pid"]}">status</a></span>`;
+                container.appendChild(div);
+            });
+        }
+
+        // graphs
+        function draw(canvasId, data) {
+            const c = document.getElementById(canvasId);
+            const ctx = c.getContext('2d');
+            c.width = c.clientWidth;
+            c.height = c.clientHeight;
+            ctx.clearRect(0, 0, c.width, c.height);
+            ctx.beginPath();
+
+            data.forEach((v, i) => {
+                const x = (i / data.length) * c.width;
+                const y = c.height - (v / 100) * c.height;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+
+            ctx.strokeStyle = '#0ff';
+            ctx.stroke();
+        }
+
+        let cpu = Array.from({ length: 20 }, () => Math.random() * 100);
+        let noise = Array.from({ length: 20 }, () => Math.random() * 100);
+
+        setInterval(() => {
+            loadProcs();
+            cpu.push(Math.random() * 100); cpu.shift();
+            noise.push(Math.random() * 100); noise.shift();
+            draw('cpu', cpu);
+            draw('noise', noise);
+        }, 1500);
+
+    </script>
+
+</body>
+
+</html>
+)====="

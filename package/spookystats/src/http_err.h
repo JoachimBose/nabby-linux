@@ -27,6 +27,9 @@ Connection: close\r\n\
 Content-Type: text/html\r\n\
 Content-Length: %d\r\n\r\n"
 
+#define HTTP_JSON_RESPONSE_TEMPLT "HTTP/1.1 200 OK\r\n\
+Content-Type: application/json\r\n\
+Content-Length: %d\r\n\r\n"
 
 static inline void send_static(int conn, const char* problem_response){
   write(conn, problem_response, strlen(problem_response));

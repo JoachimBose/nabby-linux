@@ -12,11 +12,11 @@
 #include "http_err.h"
 
 #define PORT 8084
-#define MAX_HTTP_HEADERS_SIZE 8192
+#define MAX_HTTP_HEADERS_SIZE 2048
 #define MAX_PATH_LEN 128
 
 //TODO: Regex misses ] in the path indicator.
-#define HTTP_REGEX_PATTERN "^GET \\(/[-[:alpha:][:digit:]\._/?:#@!\$&'()\*+,;=%~\[]*\\) HTTP\/1\.1\r\n\\([^\r\n]\\{1,\\}\r\n\\)\\{1,\\}\r\n"
+#define HTTP_REGEX_PATTERN "^GET \\(/[-[:alpha:][:digit:]\._/?:#@!\$&'\(\)\*+,;=%~\[]*\\) HTTP\/1\.1\r\n\\([^\r\n]\\{1,\\}\r\n\\)\\{1,\\}\r\n"
 
 #define HTTP_BODYSPLIT "\r\n\r\n"
 
@@ -81,19 +81,20 @@ int extract_path(char* hdr, char* path, int conn){
   if (r != 0)
   {
     print_regerror(r, &http_regex);
-    send_static(conn, HTTP_ERR);
+    send_static(conn, HTTP_BADREQ);
     printf("invalid\n");
     return 0;
   }
   else if (r == REG_NOMATCH || (matches[1].rm_eo - matches[1].rm_so >= MAX_PATH_LEN - 1)) {
-    send_static(conn, HTTP_BADREQ);
+    send_static(conn, HTTP_ERR);
     printf("no match\n");
     printf("%s", hdr);
     return 0;
   }
 
   assert(matches[1].rm_so > 0 && matches[1].rm_eo < MAX_HTTP_HEADERS_SIZE);
-  int path_size = matches[1].rm_eo - matches[1].rm_so >= MAX_PATH_LEN - 1;
+  int path_size = matches[1].rm_eo - matches[1].rm_so;
+
   memset(path, 0, MAX_PATH_LEN);
   memcpy(path, hdr + matches[1].rm_so, path_size);
 
