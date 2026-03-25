@@ -1,1 +1,2 @@
 source "$BR2_EXTERNAL_NABBY_LINUX_PATH/package/spookystats/Config.in"
+source "$BR2_EXTERNAL_NABBY_LINUX_PATH/package/portalctl/Config.in"

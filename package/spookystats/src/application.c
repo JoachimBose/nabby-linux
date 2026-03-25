@@ -170,5 +170,5 @@ void respond(char *path, int conn) {
     send_static(conn, HTTP_NOTFOUND);
     return;
   }
-  assert(false);
+  assert(0);
 }
