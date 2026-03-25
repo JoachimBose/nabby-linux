@@ -11,7 +11,7 @@
 #include "application.h"
 #include "http_err.h"
 
-#define PORT 8084
+#define PORT 8080
 #define MAX_HTTP_HEADERS_SIZE 2048
 #define MAX_PATH_LEN 128
 
