@@ -18,7 +18,7 @@
 		     "allwinner,suniv-f1c100s";
 
 	aliases {
-		serial0 = &uart1;
+		serial0 = &uart0;
 	};
 
 	chosen {
@@ -75,9 +75,9 @@
 	};
 };
 
-&uart1 {
+&uart0 {
         pinctrl-names = "default";
-        pinctrl-0 = <&uart1_pa_pins>;
+        pinctrl-0 = <&uart0_pe_pins>;
         status = "okay";
 };
 
