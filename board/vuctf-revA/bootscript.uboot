@@ -1,0 +1,24 @@
+# scan bootslot 1
+if mmc dev 1; then 
+    setenv boot_slot_1 mmc1; 
+else 
+    if sf probe; then 
+        setenv boot_slot_1 spi-nor;
+    else 
+        if mtd list; then 
+            setenv boot_slot_1 spi-nand; 
+        fi; 
+    fi; 
+fi;
+
+# scan bootslot 2
+run scan_boot_slot_1; 
+echo "========================="; 
+echo "Boot Device: ${boot_device}"; 
+echo "Boot Slot 0: ${boot_slot_0}"; 
+echo "Boot Slot 1: ${boot_slot_1}"; 
+echo "========================="; 
+
+setenv bootargs console=ttyS1,115200 rootwait consoleblank=0 root=/dev/mmcblk0p3 rootfstype=ext4 rw systemd.gpt_auto=no systemd.log_color=off
+load mmc 0:2 0x80500000 kernel.itb 
+bootm 0x80500000
