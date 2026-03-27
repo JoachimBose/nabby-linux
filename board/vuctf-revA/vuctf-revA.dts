@@ -18,7 +18,7 @@
 		     "allwinner,suniv-f1c100s";
 
 	aliases {
-		serial0 = &uart1;
+		serial0 = &uart0;
 	};
 
 	chosen {
@@ -33,16 +33,6 @@
 	};
 };
 
-
-&mmc0 {
-	broken-cd;
-	bus-width = <4>;
-	disable-wp;
-	vmmc-supply = <&reg_vcc3v3>;
-	status = "okay";
-};
-
-
 &otg_sram {
 	status = "okay";
 };
@@ -53,9 +43,40 @@
 	status = "okay";
 
 	flash@0 {
-		compatible = "spi-nand";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "xtx,xt25f64", "jedec,spi-nor";
 		reg = <0>;
 		spi-max-frequency = <40000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x100000>;
+				read-only;
+			};
+
+			partition@1 {
+				label = "dtb";
+				reg = <0x100000 0x10000>;
+				read-only;
+			};
+
+			partition@2 {
+				label = "kernel";
+				reg = <0x110000 0x4F0000>;
+				read-only;
+			};
+
+			partition@3 {
+				label = "rootfs";
+				reg = <0x600000 0x1A00000>;
+			};
+		};
 	};
 };
 
@@ -77,10 +98,9 @@
 	};
 };
 
-
-&uart1 {
+&uart0 {
         pinctrl-names = "default";
-        pinctrl-0 = <&uart1_pa_pins>;
+        pinctrl-0 = <&uart0_pe_pins>;
         status = "okay";
 };
 

@@ -39,4 +39,4 @@ BR2_TARGET_UBOOT_FORMAT_CUSTOM=y
 BR2_TARGET_UBOOT_FORMAT_CUSTOM_NAME="u-boot-sunxi-with-spl.bin"
 BR2_TARGET_UBOOT_CUSTOM_DTS_PATH="$(BR2_EXTERNAL_NABBY_LINUX_PATH)/board/nabby-linux/nabby-linux.dts $(BR2_EXTERNAL_NABBY_LINUX_PATH)/board/nabby-linux/nabby-linux.dtsi $(BR2_EXTERNAL_NABBY_LINUX_PATH)/board/nabby-linux/nabby-linux-u-boot.dtsi"
 BR2_TARGET_UBOOT_CUSTOM_MAKEOPTS="DEVICE_TREE=nabby-linux"
-
+BR2_PACKAGE_HOST_GENIMAGE=y
