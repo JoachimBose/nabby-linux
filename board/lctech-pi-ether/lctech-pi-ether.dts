@@ -18,7 +18,7 @@
 		     "allwinner,suniv-f1c100s";
 
 	aliases {
-		serial0 = &uart0;
+		serial0 = &uart1;
 	};
 
 	chosen {
@@ -32,6 +32,16 @@
 		regulator-max-microvolt = <3300000>;
 	};
 };
+
+
+&mmc0 {
+	broken-cd;
+	bus-width = <4>;
+	disable-wp;
+	vmmc-supply = <&reg_vcc3v3>;
+	status = "okay";
+};
+
 
 &otg_sram {
 	status = "okay";
@@ -67,9 +77,10 @@
 	};
 };
 
-&uart0 {
+
+&uart1 {
         pinctrl-names = "default";
-        pinctrl-0 = <&uart0_pe_pins>;
+        pinctrl-0 = <&uart1_pa_pins>;
         status = "okay";
 };
 
