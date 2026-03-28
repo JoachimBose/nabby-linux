@@ -47,7 +47,7 @@
 		#size-cells = <1>;
 		compatible = "xtx,xt25f64", "jedec,spi-nor";
 		reg = <0>;
-		spi-max-frequency = <40000000>;
+		spi-max-frequency = <100000000>;
 
 		partitions {
 			compatible = "fixed-partitions";
@@ -56,25 +56,25 @@
 
 			partition@0 {
 				label = "u-boot";
-				reg = <0x000000 0x100000>;
+				reg = <0x000000 0x80000>;
 				read-only;
 			};
 
 			partition@1 {
 				label = "dtb";
-				reg = <0x100000 0x10000>;
+				reg = <0x80000 0x10000>;
 				read-only;
 			};
 
 			partition@2 {
 				label = "kernel";
-				reg = <0x110000 0x4F0000>;
+				reg = <0x90000 0x380000>;
 				read-only;
 			};
 
 			partition@3 {
 				label = "rootfs";
-				reg = <0x600000 0x1A00000>;
+				reg = <0x410000 0x3f0000>;
 			};
 		};
 	};
