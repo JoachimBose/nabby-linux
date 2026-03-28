@@ -13,7 +13,7 @@
 
 
 / {
-	model = "Lctech Pi F1C200s";
+	model = "Vuctf revA";
 	compatible = "lctech,pi-f1c200s", "allwinner,suniv-f1c200s",
 		     "allwinner,suniv-f1c100s";
 

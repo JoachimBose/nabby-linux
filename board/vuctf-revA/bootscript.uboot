@@ -19,6 +19,7 @@ echo "Boot Slot 0: ${boot_slot_0}";
 echo "Boot Slot 1: ${boot_slot_1}"; 
 echo "========================="; 
 
-setenv bootargs console=ttyS1,115200 rootwait consoleblank=0 root=/dev/mmcblk0p3 rootfstype=ext4 rw systemd.gpt_auto=no systemd.log_color=off
+setenv bootargs console=tty0 console=ttyS0,115200 rootwait root=/dev/mtdblock3 rw rootfstype=jffs2
+sf probe 0; sf read 0x80500000 0x110000 0x4f0000; sf read ${fdt_addr_r} 0x100000 0x10000; bootz ${kernel_addr_r} - ${fdt_addr_r}
 load mmc 0:2 0x80500000 kernel.itb 
 bootm 0x80500000
