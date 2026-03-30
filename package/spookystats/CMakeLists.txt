@@ -22,4 +22,5 @@ src/application.c)
 
 target_link_libraries(spookystats websitelib)
 
+install(TARGETS websitelib DESTINATION lib)
 install(TARGETS spookystats DESTINATION bin)
