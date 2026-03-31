@@ -38,6 +38,24 @@
 	};
 };
 
+
+/* Define pinctrl groups added by Raj*/
+&pinctrl {
+            my_input_pin_pe3: my-input-right {                 /*pio pin added Raj */
+                pins = "PE3"; /* RIGHT button */
+                function = "gpio";
+                bias-pull-up;        /* optional */
+                input-enable;
+            };
+
+           my_input_pin_pe6: my-input-left {                 /*pio pin added Raj */
+                pins = "PE6"; /* LEFT button */
+                function = "gpio";
+                bias-pull-up;        /* optional */
+                input-enable;
+            };
+};
+
 /*
 &be0 {
 	status = "okay";

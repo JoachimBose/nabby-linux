@@ -1,0 +1,1 @@
+source "$BR2_EXTERNAL_NABBY_LINUX_PATH/package/helloworldtest/Config.in"
