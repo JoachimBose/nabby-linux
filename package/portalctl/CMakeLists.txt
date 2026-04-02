@@ -4,12 +4,13 @@ project(VUCTF26)
 add_executable(portalctl)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE debug)
 
 # include_directories(${CMAKE_SOURCE_DIR}/include)
 
 target_sources(portalctl 
 PRIVATE
-src/main.c)
+src/main.c
+src/handlers.c)
 
 install(TARGETS portalctl DESTINATION bin)
