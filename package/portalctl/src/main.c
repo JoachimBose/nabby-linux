@@ -28,34 +28,17 @@ somehow turn into a stack pivot using: something like this: `sub sp, fp, #4; pop
 
 #define CMD_SET "SET"
 #define CMD_DO "DO"
-#define MAP_ADDR (void*)0x2000000
+#define MAP_ADDR (void *)0x2000000
 
-#define _parse_cmd(X,Y)\
-if (strncmp(X, *parse_ptr, strlen(X)) == 0) { \
-    (*parse_ptr) += strlen(X);\
-    return Y;\
-} else
-
-handler_t __attribute__((noinline,noclone)) parse_cmd(char **parse_ptr, char *end_ptr) {
-    _parse_cmd(CMD_SET, set_handler);
-    _parse_cmd(CMD_DO, do_handler){
-        printf("uknown opcode %s\n", *parse_ptr);
-    }
-}
-
-#undef _parse_cmd
-
-__attribute__((unused)) void gadgets(){
-	asm volatile (
-	    "sub sp, fp, #0xc\n\t"
-	    "pop {r4, r5, fp, pc}":::
-	);
-  asm volatile (
-      "add sp, sp, #0x10\n\t"
-      "pop {r4, r5, fp, pc}":::
-  );
-}
-
+// __attribute__((unused)) void gadgets() {
+//   asm volatile("sub sp, fp, #0xc\n\t"
+//                "pop {r4, r5, fp, pc}" ::
+//                    :);
+//   asm volatile("add sp, sp, #0x10\n\t"
+//                "pop {r4, r5, fp, pc}" ::
+//                    :);
+// }
+//region helpers
 char *prep_file(char **endptr) {
   int fd = open(INFILE_NAME, O_CLOEXEC, O_RDONLY);
   if (fd < 0) {
@@ -71,7 +54,8 @@ char *prep_file(char **endptr) {
   }
   size_t file_maxsize = sb.st_size;
 
-  char *f = mmap(MAP_ADDR, file_maxsize, PROT_READ, MAP_PRIVATE | MAP_FIXED, fd, 0x0);
+  char *f =
+      mmap(MAP_ADDR, file_maxsize, PROT_READ, MAP_PRIVATE | MAP_FIXED, fd, 0x0);
   if (f == NULL) {
     perror("mmap failed\n");
     exit(EXIT_FAILURE);
@@ -80,7 +64,7 @@ char *prep_file(char **endptr) {
   return f;
 }
 
-char *skip_whitespace(char *start, char *max) {
+__attribute__((noinline,noclone)) char *skip_whitespace(char *start, char *max) {
   int i = 0;
   while (isspace(start[i]) && start + i < max) {
     i++;
@@ -88,12 +72,37 @@ char *skip_whitespace(char *start, char *max) {
   return start + i;
 }
 
+__attribute__((noinline,noclone)) char *skip_nonspace(char *start, char *max) {
+  int i = 0;
+  while (!isspace(start[i]) && start + i < max) {
+    i++;
+  }
+  return start + i;
+}
+
+#define _parse_cmd(X, Y)                                                       \
+  if (strncmp(X, *parse_ptr, strlen(X)) == 0) {                                \
+    (*parse_ptr) += strlen(X);                                                 \
+    return Y;                                                                  \
+  } else
+
+handler_t __attribute__((noinline, noclone)) parse_cmd(char **parse_ptr,
+                                                       char *end_ptr) {
+  _parse_cmd(CMD_SET, set_handler);
+  _parse_cmd(CMD_DO, do_handler) { 
+    char* og = *parse_ptr;
+    *parse_ptr = skip_nonspace(*parse_ptr, end_ptr);
+    printf("uknown opcode %s\n", og);
+  }
+}
+
+#undef _parse_cmd
+//endregion
 #define OPCODE_MAXLEN 20
 
-
 struct stack_args {
-    char arg_buf[OPCODE_MAXLEN];
-    handler_t handler;
+  char arg_buf[OPCODE_MAXLEN];
+  handler_t handler;
 };
 
 int main() {
@@ -107,22 +116,22 @@ int main() {
     parse_ptr = skip_whitespace(parse_ptr, max);
     sa.handler = parse_cmd(&parse_ptr, max);
     if (sa.handler == 0x0) {
-        printf("invalid config\n");
-        return 0;
+      printf("invalid config\n");
+      return 0;
     }
-    
+
     int c = 0;
     memset(arglist, 0, sizeof(arglist));
-    
+
     while (parse_ptr < max && c < MAX_ARG) {
-      if ( *parse_ptr == ';') {
+      if (*parse_ptr == ';') {
         parse_ptr++;
         break;
       }
 
       parse_ptr = skip_whitespace(parse_ptr, max);
-        
-      //get the next arg
+
+      // get the next arg
       for (int i = 0; !isspace(parse_ptr[i]) && i < OPCODE_MAXLEN; i++) {
         sa.arg_buf[i] = parse_ptr[i];
       }
@@ -134,8 +143,7 @@ int main() {
       c++;
       parse_ptr = skip_whitespace(parse_ptr, max);
     }
-    
 
-    sa.handler(0,0,arglist);
+    sa.handler(0, 0, arglist);
   }
 }
