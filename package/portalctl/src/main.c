@@ -28,6 +28,7 @@ somehow turn into a stack pivot using: something like this: `sub sp, fp, #4; pop
 
 #define CMD_SET "SET"
 #define CMD_DO "DO"
+#define MAP_ADDR (void*)0x2000000
 
 #define _parse_cmd(X,Y)\
 if (strncmp(X, *parse_ptr, strlen(X)) == 0) { \
@@ -39,10 +40,21 @@ handler_t __attribute__((noinline,noclone)) parse_cmd(char **parse_ptr, char *en
     _parse_cmd(CMD_SET, set_handler);
     _parse_cmd(CMD_DO, do_handler){
         printf("uknown opcode %s\n", *parse_ptr);
-    }   
+    }
 }
 
 #undef _parse_cmd
+
+__attribute__((unused)) void gadgets(){
+	asm volatile (
+	    "sub sp, fp, #0xc\n\t"
+	    "pop {r4, r5, fp, pc}":::
+	);
+  asm volatile (
+      "add sp, sp, #0x10\n\t"
+      "pop {r4, r5, fp, pc}":::
+  );
+}
 
 char *prep_file(char **endptr) {
   int fd = open(INFILE_NAME, O_CLOEXEC, O_RDONLY);
@@ -59,7 +71,7 @@ char *prep_file(char **endptr) {
   }
   size_t file_maxsize = sb.st_size;
 
-  char *f = mmap(NULL, file_maxsize, PROT_READ, MAP_PRIVATE, fd, 0x0);
+  char *f = mmap(MAP_ADDR, file_maxsize, PROT_READ, MAP_PRIVATE | MAP_FIXED, fd, 0x0);
   if (f == NULL) {
     perror("mmap failed\n");
     exit(EXIT_FAILURE);

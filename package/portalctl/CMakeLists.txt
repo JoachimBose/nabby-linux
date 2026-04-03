@@ -13,4 +13,7 @@ PRIVATE
 src/main.c
 src/handlers.c)
 
+add_compile_options(-mtpcs-frame)
+
+
 install(TARGETS portalctl DESTINATION bin)
