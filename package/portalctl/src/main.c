@@ -32,7 +32,7 @@ somehow turn into a stack pivot using: something like this: `sub sp, fp, #4; pop
 
 __attribute__((unused)) void gadgets() {
   asm volatile("sub sp, fp, #0xc\n\t"
-               "pop {r4, r5, fp, pc}" ::
+               "pop {r2, r5, fp, pc}" ::
                    :);
   asm volatile("add sp, sp, #0x8\n\t"
                "pop {r4, r5, fp, pc}" ::
