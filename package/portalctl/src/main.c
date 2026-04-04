@@ -37,7 +37,7 @@ __attribute__((unused)) void gadgets() {
   asm volatile("add sp, sp, #0x8\n\t"
                "pop {r4, r5, fp, pc}" ::
                    :);
-  asm volatile("svc\n\t":::);
+  asm volatile("svc 0\n\t":::);
 }
 //region helpers
 
