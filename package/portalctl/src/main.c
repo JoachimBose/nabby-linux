@@ -30,14 +30,14 @@ somehow turn into a stack pivot using: something like this: `sub sp, fp, #4; pop
 #define CMD_DO "DO"
 #define MAP_ADDR (void *)0x2000000
 
-// __attribute__((unused)) void gadgets() {
-//   asm volatile("sub sp, fp, #0xc\n\t"
-//                "pop {r4, r5, fp, pc}" ::
-//                    :);
-//   asm volatile("add sp, sp, #0x10\n\t"
-//                "pop {r4, r5, fp, pc}" ::
-//                    :);
-// }
+__attribute__((unused)) void gadgets() {
+  asm volatile("sub sp, fp, #0xc\n\t"
+               "pop {r4, r5, fp, pc}" ::
+                   :);
+  asm volatile("add sp, sp, #0x10\n\t"
+               "pop {r4, r5, fp, pc}" ::
+                   :);
+}
 //region helpers
 char *prep_file(char **endptr) {
   int fd = open(INFILE_NAME, O_CLOEXEC, O_RDONLY);
@@ -131,12 +131,12 @@ int main() {
 
       parse_ptr = skip_whitespace(parse_ptr, max);
 
-      // get the next arg
-      for (int i = 0; !isspace(parse_ptr[i]) && i < OPCODE_MAXLEN; i++) {
-        sa.arg_buf[i] = parse_ptr[i];
+      // get the next argparse_ptr
+      size_t argsize = 0;
+      for (; !isspace(parse_ptr[argsize]) && argsize < OPCODE_MAXLEN; argsize++) {
+        sa.arg_buf[argsize] = parse_ptr[argsize];
       }
 
-      size_t argsize = strlen(sa.arg_buf);
       arglist[c] = calloc(argsize + 1, 1);
       memcpy(arglist[c], sa.arg_buf, argsize);
       parse_ptr += argsize;
