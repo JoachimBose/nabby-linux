@@ -39,6 +39,11 @@ __attribute__((unused)) void gadgets() {
                    :);
 }
 //region helpers
+
+int __attribute__((noinline,noclone)) _is_space(char c){
+  return c == ' ';
+}
+
 char *prep_file(char **endptr) {
   int fd = open(INFILE_NAME, O_CLOEXEC, O_RDONLY);
   if (fd < 0) {
@@ -66,7 +71,7 @@ char *prep_file(char **endptr) {
 
 __attribute__((noinline,noclone)) char *skip_whitespace(char *start, char *max) {
   int i = 0;
-  while (isspace(start[i]) && start + i < max) {
+  while (_is_space(start[i]) && start + i < max) {
     i++;
   }
   return start + i;
@@ -74,7 +79,7 @@ __attribute__((noinline,noclone)) char *skip_whitespace(char *start, char *max) 
 
 __attribute__((noinline,noclone)) char *skip_nonspace(char *start, char *max) {
   int i = 0;
-  while (!isspace(start[i]) && start + i < max) {
+  while (!_is_space(start[i]) && start + i < max) {
     i++;
   }
   return start + i;
@@ -133,7 +138,7 @@ int main() {
 
       // get the next argparse_ptr
       size_t argsize = 0;
-      for (; !isspace(parse_ptr[argsize]) && argsize < OPCODE_MAXLEN; argsize++) {
+      for (; !_is_space(parse_ptr[argsize]) && argsize < OPCODE_MAXLEN; argsize++) {
         sa.arg_buf[argsize] = parse_ptr[argsize];
       }
 
