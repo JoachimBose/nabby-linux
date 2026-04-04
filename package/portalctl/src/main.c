@@ -38,6 +38,8 @@ __attribute__((unused)) void gadgets() {
                "pop {r4, r5, fp, pc}" ::
                    :);
   asm volatile("svc 0\n\t":::);
+  asm volatile("mov r1, r6\n\t"
+               "blx r7\n\t":::);
 }
 //region helpers
 
