@@ -34,7 +34,7 @@ __attribute__((unused)) void gadgets() {
   asm volatile("sub sp, fp, #0xc\n\t"
                "pop {r4, r5, fp, pc}" ::
                    :);
-  asm volatile("add sp, sp, #0x10\n\t"
+  asm volatile("add sp, sp, #0x8\n\t"
                "pop {r4, r5, fp, pc}" ::
                    :);
 }
