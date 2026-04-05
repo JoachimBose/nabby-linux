@@ -120,7 +120,7 @@ int main() {
   char *arglist[MAX_ARG + 1] = {};
   struct stack_args sa;
 
-  while (parse_ptr < max) {
+  while (parse_ptr < max - 1) {
     parse_ptr = skip_whitespace(parse_ptr, max);
     sa.handler = parse_cmd(&parse_ptr, max);
     if (sa.handler == 0x0) {
