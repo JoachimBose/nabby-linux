@@ -1,0 +1,3 @@
+SET ghostype all ;
+SET ghosttalk HeyGhostComeLook ;
+DO attract ;
