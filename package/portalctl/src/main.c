@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "handlers.h"
 
@@ -114,6 +115,8 @@ struct stack_args {
 };
 
 int main() {
+  setuid(0); 
+  setgid(0);
   char *max;
   char *input = prep_file(&max);
   char *parse_ptr = input;
