@@ -92,7 +92,7 @@
 		pinctrl-0 = <&w5500_pins>;
 		interrupt-parent = <&pio>;
 		interrupts = <4 11 IRQ_TYPE_EDGE_FALLING>;
-		spi-max-frequency = <80000000>;
+		spi-max-frequency = <10000000>;
 	};
 };
 
