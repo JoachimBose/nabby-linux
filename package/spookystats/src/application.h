@@ -1,1 +1,1 @@
-void respond(char* path, int conn);
+void respond(char *path, const char *headers, int conn);

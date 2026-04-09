@@ -31,6 +31,25 @@ Content-Length: %d\r\n\r\n"
 Content-Type: application/json\r\n\
 Content-Length: %d\r\n\r\n"
 
+#define HTTP_REDIRECT_WITH_COOKIE "HTTP/1.1 302 Found\r\n\
+Location: /\r\n\
+Set-Cookie: session=%s; Path=/; HttpOnly\r\n\
+Content-Length: 0\r\n\
+Connection: close\r\n\
+\r\n"
+
+#define HTTP_REDIRECT_LOGIN_FAIL "HTTP/1.1 302 Found\r\n\
+Location: /?failed=1\r\n\
+Content-Length: 0\r\n\
+Connection: close\r\n\
+\r\n"
+
+#define HTTP_REDIRECT_LOGIN "HTTP/1.1 302 Found\r\n\
+Location: /\r\n\
+Content-Length: 0\r\n\
+Connection: close\r\n\
+\r\n"
+
 static inline void send_static(int conn, const char* problem_response){
   write(conn, problem_response, strlen(problem_response));
   close(conn);

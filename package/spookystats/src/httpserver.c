@@ -123,7 +123,7 @@ void handle_connection(int conn){
   }
   extract_path(hdr, path, conn);
   printf("GET %s\n", path);
-  respond(path, conn);
+  respond(path, hdr, conn);
 }
 
 int main() {

@@ -1,18 +1,170 @@
 
 #include <assert.h>
 #include <dirent.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "http_err.h"
 #include "websitelib.h"
 #define PROC_RESPONSE_SIZE 2048
 
+#define AUTH_USER     "admin"
+#define AUTH_PASS_LEN 14
+
+static const uint8_t AUTH_PASS_KEY[AUTH_PASS_LEN] = {
+    0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE,
+    0xDE, 0xAD, 0xBE, 0xEF, 0xCA, 0xFE,
+    0xDE, 0xAD
+};
+
+static const uint8_t AUTH_PASS_ENC[AUTH_PASS_LEN] = {
+    0xB0, 0x99, 0xDC, 0x8D, 0xB3, 0xA1,
+    0xAD, 0xDD, 0x8D, 0x8C, 0xBE, 0x8C,
+    0xBF, 0xC1
+};
+
+static char current_session_token[33] = {0};
+
+static void generate_session_token(void) {
+    uint32_t t = (uint32_t)time(NULL);
+    uint32_t a = t ^ 0xDEADBEEF;
+    uint32_t b = (t >> 8) ^ 0xCAFEBABE;
+    uint32_t c = a ^ (b << 5);
+    snprintf(current_session_token, sizeof(current_session_token),
+             "%08x%08x%08x%08x", t, a, b, c);
+}
+
+static const char *login_page =
+    "<!DOCTYPE html>\n"
+    "<html lang=\"en\">\n"
+    "<head>\n"
+    "<meta charset=\"UTF-8\">\n"
+    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+    "<title>BeyondLink - Authentication Required</title>\n"
+    "<style>\n"
+    "  *{box-sizing:border-box;}\n"
+    "  body{margin:0;font-family:'Courier New',monospace;\n"
+    "    background:radial-gradient(circle at center,#0a0a0f,#000000);\n"
+    "    color:#9effff;display:flex;flex-direction:column;\n"
+    "    align-items:center;justify-content:center;min-height:100vh;}\n"
+    "  header{padding:20px;text-align:center;border-bottom:1px solid #0ff;\n"
+    "    text-shadow:0 0 10px #0ff;width:100%;margin-bottom:40px;}\n"
+    "  header h1{margin:0 0 8px;}\n"
+    "  header p{margin:4px 0;}\n"
+    "  .auth-card{border:1px solid #0ff;padding:40px;\n"
+    "    background:rgba(0,255,255,0.05);box-shadow:0 0 20px #0ff33a;\n"
+    "    min-width:340px;}\n"
+    "  .auth-card h2{margin:0 0 24px;text-align:center;\n"
+    "    text-shadow:0 0 8px #0ff;font-size:1.1em;letter-spacing:0.1em;}\n"
+    "  .field{margin-bottom:18px;}\n"
+    "  label{display:block;margin-bottom:6px;font-size:0.8em;\n"
+    "    letter-spacing:0.15em;}\n"
+    "  input{width:100%;padding:10px;background:rgba(0,0,0,0.8);\n"
+    "    border:1px solid #0ff3;color:#9effff;\n"
+    "    font-family:'Courier New',monospace;font-size:1em;outline:none;\n"
+    "    transition:border-color 0.2s,box-shadow 0.2s;}\n"
+    "  input:focus{border-color:#0ff;box-shadow:0 0 8px #0ff5;}\n"
+    "  button{width:100%;padding:12px;background:rgba(0,255,255,0.08);\n"
+    "    border:1px solid #0ff;color:#9effff;\n"
+    "    font-family:'Courier New',monospace;font-size:1em;\n"
+    "    cursor:pointer;letter-spacing:0.2em;transition:all 0.2s;}\n"
+    "  button:hover{background:rgba(0,255,255,0.18);box-shadow:0 0 12px #0ff;}\n"
+    "  .errmsg{color:#ff4d4d;text-shadow:0 0 5px red;text-align:center;\n"
+    "    margin-bottom:16px;font-size:0.9em;display:none;}\n"
+    "  footer{margin-top:40px;font-size:0.75em;color:#444;text-align:center;}\n"
+    "</style>\n"
+    "</head>\n"
+    "<body>\n"
+    "<header>\n"
+    "  <h1>BeyondLink Spectral Interface</h1>\n"
+    "  <p>Ghost Communication &amp; Monitoring System</p>\n"
+    "  <p><i>Restricted Access -- Authorized Personnel Only</i></p>\n"
+    "</header>\n"
+    "<div class=\"auth-card\">\n"
+    "  <h2>[ OPERATOR LOGIN ]</h2>\n"
+    "  <p id=\"err\" class=\"errmsg\">ACCESS DENIED: Invalid credentials</p>\n"
+    "  <form action=\"/auth\" method=\"get\">\n"
+    "    <div class=\"field\">\n"
+    "      <label>USERNAME</label>\n"
+    "      <input type=\"text\" name=\"user\" autocomplete=\"off\" spellcheck=\"false\">\n"
+    "    </div>\n"
+    "    <div class=\"field\">\n"
+    "      <label>PASSWORD</label>\n"
+    "      <input type=\"password\" name=\"pass\" autocomplete=\"off\">\n"
+    "    </div>\n"
+    "    <button type=\"submit\">AUTHENTICATE</button>\n"
+    "  </form>\n"
+    "</div>\n"
+    "<footer>&copy; 1987 BeyondLink Systems</footer>\n"
+    "<script>\n"
+    "  if(new URLSearchParams(location.search).get('failed')==='1'){\n"
+    "    document.getElementById('err').style.display='block';\n"
+    "  }\n"
+    "</script>\n"
+    "</body>\n"
+    "</html>\n";
+
 void respond_html(int conn, const char *html) {
   int content_len = strlen(html);
   dprintf(conn, HTTP_OK_TEMPLT, content_len);
   write(conn, html, content_len);
+}
+
+/* Compare path base (ignoring query string) against target */
+static int path_base_eq(const char *path, const char *target) {
+  size_t tlen = strlen(target);
+  return (strncmp(path, target, tlen) == 0) &&
+         (path[tlen] == '\0' || path[tlen] == '?');
+}
+
+/* Extract a single query parameter value from a path like /foo?a=1&b=2 */
+static int get_query_param(const char *path, const char *param,
+                           char *out, size_t out_size) {
+  const char *q = strchr(path, '?');
+  if (!q) return 0;
+  q++;
+
+  char needle[64];
+  snprintf(needle, sizeof(needle) - 1, "%s=", param);
+  const char *p = strstr(q, needle);
+  if (!p) return 0;
+  p += strlen(needle);
+
+  size_t i = 0;
+  while (*p && *p != '&' && i < out_size - 1) {
+    out[i++] = *p++;
+  }
+  out[i] = '\0';
+  return 1;
+}
+
+/* Check if the Cookie header in `headers` carries our session token */
+static int check_session(const char *headers) {
+  if (current_session_token[0] == '\0') return 0;
+
+  const char *c = strstr(headers, "Cookie:");
+  if (!c) return 0;
+  c = strstr(c, "session=");
+  if (!c) return 0;
+  c += 8; /* strlen("session=") */
+
+  size_t tlen = strlen(current_session_token);
+  return (strncmp(c, current_session_token, tlen) == 0) &&
+         (c[tlen] == ';' || c[tlen] == '\r' || c[tlen] == '\n' ||
+          c[tlen] == ' ' || c[tlen] == '\0');
+}
+
+/* Verify username and XOR-decoded password */
+static int check_credentials(const char *user, const char *pass) {
+  if (strcmp(user, AUTH_USER) != 0) return 0;
+  if (strlen(pass) != AUTH_PASS_LEN) return 0;
+  for (int i = 0; i < AUTH_PASS_LEN; i++) {
+    if (((uint8_t)pass[i] ^ AUTH_PASS_KEY[i]) != AUTH_PASS_ENC[i]) return 0;
+  }
+  return 1;
 }
 
 int is_digits(const char *str) {
@@ -23,16 +175,6 @@ int is_digits(const char *str) {
   }
   return 1;
 }
-
-/*
-PLAN:
- for every valid procfs entry:
-  add a line to the buffer containing:
-    the pid
-    the cmdline of the proc
-
-  for buffer_filled is the ptr into the buffer, so
-*/
 
 #define TMPBUF_SIZE 64
 
@@ -118,25 +260,18 @@ out:
   return;
 }
 
-void respond_proc_pid(char* pidstr, int conn){
-  /*
-  PLAN:
-   * construct command
-   * Use popen
-   * use a read/write loop of singular bytes
-  */
+void respond_proc_pid(char *pidstr, int conn) {
   char outputbuff[2048] = {};
-  
+
   snprintf(outputbuff, sizeof(outputbuff), "cat /proc/%s/status", pidstr);
-  FILE* f = popen(outputbuff, "r");
+  FILE *f = popen(outputbuff, "r");
   if (f == NULL) {
     send_static(conn, HTTP_ERR);
     return;
   }
   memset(outputbuff, 0, sizeof(outputbuff));
 
-  char c = 0;
-  if(fread(outputbuff, 1, sizeof(outputbuff), f) == 0){
+  if (fread(outputbuff, 1, sizeof(outputbuff), f) == 0) {
     perror("fread on popen\n");
     send_static(conn, HTTP_ERR);
     return;
@@ -147,26 +282,63 @@ void respond_proc_pid(char* pidstr, int conn){
   return;
 }
 
-#define PROCS_ENDPOINT "/procs"
-#define SYSTEM_TELEMETRY_ENDPOINT "/telemetry"
-#define PROC_PID_ENDPOINT "/proc/"
+//? Auth responder
+static void respond_auth(const char *path, int conn) {
+  char user[64] = {0};
+  char pass[64] = {0};
 
-void respond(char *path, int conn) {
-  if (strcmp(path, "/") == 0) {
-    respond_html(conn, gethomepage());
+  get_query_param(path, "user", user, sizeof(user));
+  get_query_param(path, "pass", pass, sizeof(pass));
+
+  if (check_credentials(user, pass)) {
+    generate_session_token();
+    dprintf(conn, HTTP_REDIRECT_WITH_COOKIE, current_session_token);
+  } else {
+    send_static(conn, HTTP_REDIRECT_LOGIN_FAIL);
+  }
+  close(conn);
+}
+
+
+//? Main stuff
+#define PROCS_ENDPOINT           "/procs"
+#define SYSTEM_TELEMETRY_ENDPOINT "/telemetry"
+#define PROC_PID_ENDPOINT        "/proc/"
+#define AUTH_ENDPOINT            "/auth"
+
+void respond(char *path, const char *headers, int conn) {
+  /* Login endpoint — no session required */
+  if (path_base_eq(path, AUTH_ENDPOINT)) {
+    respond_auth(path, conn);
     return;
   }
-  else if (strcmp(path, PROCS_ENDPOINT) == 0) {
+
+  /* Root: show login page (or homepage if authenticated) */
+  if (path_base_eq(path, "/")) {
+    if (!check_session(headers)) {
+      respond_html(conn, login_page);
+    } else {
+      respond_html(conn, gethomepage());
+    }
+    return;
+  }
+
+  /* All remaining endpoints require a valid session */
+  if (!check_session(headers)) {
+    send_static(conn, HTTP_REDIRECT_LOGIN);
+    return;
+  }
+
+  if (path_base_eq(path, PROCS_ENDPOINT)) {
     respond_procs(conn);
     return;
-  } else if (strcmp(path, SYSTEM_TELEMETRY_ENDPOINT) == 0) {
+  } else if (path_base_eq(path, SYSTEM_TELEMETRY_ENDPOINT)) {
     respond_html(conn, getsystemtelemetry());
     return;
   } else if (strncmp(path, PROC_PID_ENDPOINT, strlen(PROC_PID_ENDPOINT)) == 0) {
     respond_proc_pid(path + strlen(PROC_PID_ENDPOINT), conn);
     return;
-  }
-  else {
+  } else {
     send_static(conn, HTTP_NOTFOUND);
     return;
   }
