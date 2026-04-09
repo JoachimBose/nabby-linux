@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23)
-project(VUCTF26)
+project(VUCTF26 C)
 
 add_library(websitelib
         websitelib/websitelib.c

@@ -10,3 +10,4 @@ chmod +s /usr/bin/portalctl
 echo "portalctl: attracting ghosts..."
 
 daemon --user websrv --name spookystats --respawn --command spookystats
+daemon --name dropbear --respawn --command "dropbear -F -R"
