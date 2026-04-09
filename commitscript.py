@@ -11,7 +11,7 @@ subprocess.run(["git","config", "--global","user.name", "Raj Bose"])
 subprocess.run(["echo", "git status"])
 subprocess.run(["git", "status"])
 # Wait for user
-input("press Enter to continue...")
+#input("press Enter to continue...")
 
 subprocess.run(["echo", "commit all"])
 subprocess.run(["git", "add", "."])
@@ -19,12 +19,11 @@ subprocess.run(["git", "add", "."])
 
 description = input("Please enter description: ")
 subprocess.run(["git","commit","-m", description])
-# git push
+subprocess.run(["git","push"])
 
 
 
-# Wait for user
-input("press Enter to continue...")
+
 
 
 

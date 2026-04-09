@@ -165,6 +165,18 @@
 				function = "spi0";
 			};
 
+			
+           	spi1_pins: spi1-pins-pe {
+		        pins = "PE7", "PE8", "PE9", "PE10";
+		        function = "spi1";
+	        };
+
+            backlight_pin: backlight_pin {
+              pins = "PD3";
+              function = "backlight";
+             };
+
+
 			uart0_pe_pins: uart0-pe-pins {
 				pins = "PE0", "PE1";
 				function = "uart0";
@@ -177,14 +189,14 @@
 
 		};
 
-/* Exposing the gpio-keys. added by Raj */
+/* Exposing the gpio-keys. added by Raj * /
 gpio_keys: gpio-keys {
     compatible = "gpio-keys";
 
     di_right: di-right {
         label = "DI_RIGHT";
         linux,code = <1>;
-        gpios = <&pio 4 3 GPIO_ACTIVE_LOW>; /* PE3 = bank 4, pin 3 */
+        gpios = <&pio 4 3 GPIO_ACTIVE_LOW>; / * PE3 = bank 4, pin 3 * /
         pinctrl-names = "default";
         pinctrl-0 = <&my_input_pin_pe3>;
         debounce-interval = <10>;
@@ -193,13 +205,12 @@ gpio_keys: gpio-keys {
     di_left: di-left {
         label = "DI_LEFT";
         linux,code = <2>;
-        gpios = <&pio 4 6 GPIO_ACTIVE_LOW>; /* PE6 = bank 4, pin 6 */
+        gpios = <&pio 4 6 GPIO_ACTIVE_LOW>; / * PE6 = bank 4, pin 6 * /
         pinctrl-names = "default";
         pinctrl-0 = <&my_input_pin_pe6>;
         debounce-interval = <10>;
     };
-};
-
+}; */
 
 
 
