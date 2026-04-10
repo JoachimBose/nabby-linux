@@ -52,6 +52,5 @@ Connection: close\r\n\
 
 static inline void send_static(int conn, const char* problem_response){
   write(conn, problem_response, strlen(problem_response));
-  close(conn);
   printf("sending problem..\n");
 }

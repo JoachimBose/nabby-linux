@@ -296,7 +296,6 @@ static void respond_auth(const char *path, int conn) {
   } else {
     send_static(conn, HTTP_REDIRECT_LOGIN_FAIL);
   }
-  close(conn);
 }
 
 
