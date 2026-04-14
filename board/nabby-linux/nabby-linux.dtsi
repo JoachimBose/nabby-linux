@@ -169,6 +169,7 @@
            	spi1_pins: spi1-pins-pe {
 		        pins = "PE7", "PE8", "PE9", "PE10";
 		        function = "spi1";
+                drive-strength = <40>; /* added Raj to fix clk */
 	        };
 
             backlight_pin: backlight_pin {
@@ -188,31 +189,6 @@
 			};
 
 		};
-
-/* Exposing the gpio-keys. added by Raj * /
-gpio_keys: gpio-keys {
-    compatible = "gpio-keys";
-
-    di_right: di-right {
-        label = "DI_RIGHT";
-        linux,code = <1>;
-        gpios = <&pio 4 3 GPIO_ACTIVE_LOW>; / * PE3 = bank 4, pin 3 * /
-        pinctrl-names = "default";
-        pinctrl-0 = <&my_input_pin_pe3>;
-        debounce-interval = <10>;
-    };
-
-    di_left: di-left {
-        label = "DI_LEFT";
-        linux,code = <2>;
-        gpios = <&pio 4 6 GPIO_ACTIVE_LOW>; / * PE6 = bank 4, pin 6 * /
-        pinctrl-names = "default";
-        pinctrl-0 = <&my_input_pin_pe6>;
-        debounce-interval = <10>;
-    };
-}; */
-
-
 
 		timer@1c20c00 {
 			compatible = "allwinner,suniv-f1c100s-timer";

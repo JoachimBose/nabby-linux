@@ -36,7 +36,7 @@
 
 int main(void)
 {
-    printf("Hello [v9Apr26],  Reading digital inputs...\n");
+    printf("Hello [v11Apr26],  Reading digital inputs...\n");
 
     /* 1. OPEN CHIP */
     struct gpiod_chip *chip = gpiod_chip_open(CHIP);
