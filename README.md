@@ -18,7 +18,8 @@ to flash the board while its in FEL mode.
 The VUCTF26 board has support for the w5500 dev boards like the w850io or the cheaper USR-ES1. There exist also the Spookystats vulnerable website and the portalctl privilege escalation 
 challenge which can be compiled as a buildroot package. Any questions are welcome towards joa0405 on discord!
 
-![board.png](pics/board.jpg?raw=true "VUCTF26 board")
+![board.png](pics/board.png?raw=true "VUCTF26 board")
+![board.png](pics/schematic.png?raw=true "VUCTF26 schematic")
 ![schematic.pdf](pics/schematic.pdf?raw=true "VUCTF26 schematic")
 
 
