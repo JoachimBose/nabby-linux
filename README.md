@@ -13,6 +13,15 @@ sunxi-fel -p spiflash-write 0 flash.bin
 ```
 to flash the board while its in FEL mode.
 
+# VUCTF-2026 board
+
+The VUCTF26 board has support for the w5500 dev boards like the w850io or the cheaper USR-ES1. There exist also the Spookystats vulnerable website and the portalctl privilege escalation 
+challenge which can be compiled as a buildroot package. Any questions are welcome towards joa0405 on discord!
+
+![board.png](pics/board.jpg?raw=true "VUCTF26 board")
+![schematic.pdf](pics/schematic.pdf?raw=true "VUCTF26 schematic")
+
+
 ## Acknowledgements
 When we built the nabby board, we forked the repository from: [BasicCode](https://github.com/BasicCode/F1C100-Business-Card/tree/main/board/f1c100-business-card)
 and we are very thankful for their contribution & GPL-2.0 license. In BasicCodes repository, they acknowledged help from the following authors:
