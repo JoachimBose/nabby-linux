@@ -1,0 +1,2 @@
+websrv -2 websrv -2 * /home/websrv /bin/sh - 
+lab_assistant -2 websrv -2 !=banshee /home/lab_assistant /bin/false -

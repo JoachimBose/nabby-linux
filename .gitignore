@@ -1,2 +1,6 @@
 /.vagrant
 /*console.log
+package/*/build
+package/*/.cache
+**/.gdb_history
+.vscode
