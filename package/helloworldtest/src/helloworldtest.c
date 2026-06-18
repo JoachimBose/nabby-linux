@@ -46,7 +46,7 @@ int main(void)
     }
     printf("chip initilized\n");
         const char *version = gpiod_api_version();
-        printf("API version: %s\n", version);
+        printf("API version: %s\n ", version);
         struct gpiod_chip_info *info = gpiod_chip_get_info(chip);
         const char *name = gpiod_chip_info_get_name(info);
         printf("Chip name = %s\n", name);
