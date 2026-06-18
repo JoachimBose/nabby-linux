@@ -1,0 +1,6 @@
+config BR2_PACKAGE_HELLOWORLDTEST
+        bool "helloworldtest"
+        help
+          helloworltest is a test app to experiment with GPIO.
+          Initially it prints DIO. Extension in LED driving.
+

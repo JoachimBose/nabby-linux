@@ -165,6 +165,19 @@
 				function = "spi0";
 			};
 
+			
+           	spi1_pins: spi1-pins-pe {
+		        pins = "PE7", "PE8", "PE9", "PE10";
+		        function = "spi1";
+                drive-strength = <40>; /* added Raj to fix clk */
+	        };
+
+            backlight_pin: backlight_pin {
+              pins = "PD3";
+              function = "backlight";
+             };
+
+
 			uart0_pe_pins: uart0-pe-pins {
 				pins = "PE0", "PE1";
 				function = "uart0";
@@ -174,6 +187,7 @@
 				pins = "PF0", "PF1", "PF2", "PF3", "PF4", "PF5";
 				function = "mmc0";
 			};
+
 		};
 
 		timer@1c20c00 {

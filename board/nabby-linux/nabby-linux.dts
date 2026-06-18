@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR X11)
+
 /*
  * Copyright 2018 Icenowy Zheng <icenowy@aosc.io>
  */
@@ -8,7 +9,7 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-	model = "BasicCode F1C100 Business Card";
+	model = "Nabby Linux Board"; 
 	compatible = "allwinner,suniv-f1c100s";
 
 	aliases {
@@ -31,12 +32,51 @@
 /*
  * Pin Definitions
  */
-&pio {			
-	spi1_pc_pins: spi1-pc-pins {
-		pins = "PE7", "PE8", "PE9", "PE10";
-		function = "spi1";
-	};
-};
+
+
+
+/* Define pinctrl groups added by Raj* /
+&pinctrl {
+            my_input_pin_pe3: my-input-right {                 / *pio pin added Raj * /
+                pins = "PE3"; / * RIGHT button * /
+                function = "gpio";
+                bias-pull-up;        / * optional * /
+                input-enable;
+            };
+
+           my_input_pin_pe6: my-input-left {                 / *pio pin added Raj * /
+                pins = "PE6"; / * LEFT button * /
+                function = "gpio";
+                bias-pull-up;        / * optional * /
+                input-enable;
+            };
+}; */
+
+/* Exposing the gpio-keys. added by Raj * /
+gpio_keys: gpio-keys {
+    compatible = "gpio-keys";
+
+    di_right: di-right {
+        label = "DI_RIGHT";
+        linux,code = <1>;
+        gpios = <&pio 4 3 GPIO_ACTIVE_LOW>; / * PE3 = bank 4, pin 3 * /
+        pinctrl-names = "default";
+        pinctrl-0 = <&my_input_pin_pe3>;
+        debounce-interval = <10>;
+    };
+
+    di_left: di-left {
+        label = "DI_LEFT";
+        linux,code = <2>;
+        gpios = <&pio 4 6 GPIO_ACTIVE_LOW>; / * PE6 = bank 4, pin 6 * /
+        pinctrl-names = "default";
+        pinctrl-0 = <&my_input_pin_pe6>;
+        debounce-interval = <10>;
+    };
+}; */
+
+
+
 
 /*
 &be0 {
@@ -92,18 +132,28 @@
 };
 
 &spi1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&spi1_pc_pins>;
-	status = "okay";
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&spi1_pins>;
 
-	panel: panel@0{
-		compatible = "jianda,jd-t18003-t01", "sitronix,st7735r";
-		reg = <0>;
-		spi-max-frequency = <32000000>;
-		dc-gpios = <&pio 3 16 GPIO_ACTIVE_HIGH>; //PD16
-		reset-gpios = <&pio 3 17 GPIO_ACTIVE_HIGH>; //PD17
-		rotation = <270>;
-	};
+    display@0 {
+        compatible = "ilitek,ili9341";
+        reg = <0>;                       // CS0
+        spi-max-frequency = <8000000>;
+        spi-cpol;                           /* SPI mode 3 */ //added 9/4
+        spi-cpha;                              //added 9/4
+        dc-gpios = <&pio 3 16 GPIO_ACTIVE_HIGH>; // PD = 3
+        reset-gpios = <&pio 3 17 GPIO_ACTIVE_LOW>;
+      /*  backlight = <&backlight_pin>; */
+
+        rotation = <270>;                // Optional
+        buswidth = <8>;                  /* ADD THIS */
+        rgb;                              // Use RGB pixel order if needed
+
+        status = "okay";
+        /* force full reinit on every use */
+        always-update;
+    };
 };
 
 &uart0 {
